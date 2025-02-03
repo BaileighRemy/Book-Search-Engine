@@ -63,14 +63,19 @@ const resolvers = {
       const token = signToken(user.username, user.password, user._id);
       return { token, user };
     },
-    saveBook: async (_parent: unknown, { authors, description, title, bookId, image, link }: SaveBookArgs, context: Context) => {
+    saveBook: async (_parent: unknown, { bookId, authors, title, description, image, link }: SaveBookArgs, context: Context) => {
       if (context.user) {
-        const updatedUser = await User.findByIdAndUpdate(
-          context.user._id,
-          { $addToSet: { savedBooks: { authors, description, title, bookId, image, link } } },
-          { new: true, runValidators: true }
-        );
-        return updatedUser;
+        try {
+          const updatedUser = await User.findByIdAndUpdate(
+            context.user._id,
+            { $addToSet: { savedBooks: { authors, description, title, bookId, image, link } } },
+            { new: true, runValidators: true }
+          );
+          return updatedUser;
+        } catch (error) {
+          console.error("Error saving book:", error);
+          throw new Error('Failed to save book');
+        }
       }
       throw new AuthenticationError('Not authenticated');
     },
