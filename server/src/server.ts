@@ -6,10 +6,15 @@ import routes from './routes/index.js';
 import { ApolloServer } from 'apollo-server-express'; 
 import { typeDefs, resolvers } from './schemas/index.js'; 
 import { authenticateToken } from './services/auth.js';
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
 
 
 const app: Application = express();
 const PORT = process.env.PORT || 3001;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 app.use(cors({
   origin: '*', // Allow requests from this origin
