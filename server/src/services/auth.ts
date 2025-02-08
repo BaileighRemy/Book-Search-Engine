@@ -13,7 +13,7 @@ export const authenticateToken = ({ req }: any) => {
   if (!token) {
     return req;
   }
-
+console.log('token', token);
   try {
     const { data }: any = jwt.verify(token, process.env.JWT_SECRET_KEY || 'bookfinder', { maxAge: '2hr' });
     req.user = data;

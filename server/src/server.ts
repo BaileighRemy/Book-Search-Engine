@@ -3,8 +3,10 @@ import cors from 'cors';
 import path from 'node:path';
 import db from './config/connection.js';
 import routes from './routes/index.js';
-import { ApolloServer } from 'apollo-server-express'; // Import ApolloServer
+import { ApolloServer } from 'apollo-server-express'; 
 import { typeDefs, resolvers } from './schemas/index.js'; 
+import { authenticateToken } from './services/auth.js';
+
 
 const app: Application = express();
 const PORT = process.env.PORT || 3001;
@@ -21,7 +23,7 @@ app.use(express.json());
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: ({ req }) => ({ req }), // Pass the request to the context
+  context: authenticateToken
 });
 
 // Apply Apollo middleware to the Express app
@@ -31,12 +33,13 @@ server.applyMiddleware({
   cors: {
     origin: 'http://localhost:3000', // Allow requests from this origin
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
-  }
+  },
+ 
 }); // Apply Apollo middleware
 
 // If we're in production, serve client/build as static assets
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../client/build')));
+  app.use(express.static(path.join(__dirname, '../client/dist')));
 }
 
 app.use(routes);
